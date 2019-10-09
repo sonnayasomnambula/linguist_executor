@@ -121,7 +121,7 @@ void ProParser::parseSubDirPath(QString subdir, QString path)
 {
     subdir.remove(".subdir");
     path.replace("$$PWD", mRoot.absolutePath());
-    mSubDirs[subdir] = path + QDir::separator() + subdir + ".pro";
+    mSubDirs[subdir] = path + QDir::separator() + QDir(path).dirName() + ".pro";
 }
 
 void ProParser::parseTranslations(QString translations)
@@ -129,9 +129,9 @@ void ProParser::parseTranslations(QString translations)
     for (QString path: translations.split(" "))
     {
         path = path.trimmed();
-        if (!path.startsWith("$$PWD"))
-            path.prepend(QString("$$PWD") + QDir::separator());
         path.replace("$$PWD", mRoot.absolutePath());
+        if (!QDir(path).isAbsolute())
+            path = mRoot.absoluteFilePath(path);
         mTsFiles.insert(QDir::cleanPath(path));
     }
 
